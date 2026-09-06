@@ -406,13 +406,11 @@
     
     <!-- 미닛 채팅(문의)창 열기 연동 스크립트 -->
     <script>
-        const inquiryBtn = document.getElementById('inquiryBtn');
-        if (inquiryBtn) {
-            inquiryBtn.addEventListener('click', function() {
-                // 부모 창(미닛)으로 'openInquiry' 신호 보내기
-                window.parent.postMessage({ type: 'openInquiry' }, '*');
-            });
-        }
+         window.parent.postMessage(
+        	{
+        		type: 'openInquiry'
+        	}
+        );
     </script>
 
 </body>
