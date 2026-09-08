@@ -586,18 +586,32 @@
             }
         });
 
-        // ==========================================
-        // 미닛 통신 연동 (자동 높이 조절)
+// ==========================================
+        // 미닛 통신 연동 (여백 무한 증식 버그 완벽 해결판)
         // ==========================================
         function updateIframeHeight() {
-            const currentHeight = document.documentElement.scrollHeight;
-            window.parent.postMessage({ type: 'resize', height: currentHeight }, '*');
+            // 전체 화면(body)이 아닌 내용물 뼈대(.container)의 순수 높이만 측정합니다.
+            const container = document.querySelector('.container');
+            if (!container) return;
+            
+            // 컨테이너 순수 높이 + 상하 패딩(100px)만 더해서 보냄 (무한 루프 원천 차단)
+            const exactHeight = container.offsetHeight + 100;
+            window.parent.postMessage({ type: 'resize', height: exactHeight }, '*');
         }
-        window.addEventListener('load', updateIframeHeight);
+
+        window.addEventListener('load', () => {
+            setTimeout(updateIframeHeight, 300);
+        });
+
         if ('ResizeObserver' in window) {
-            const resizeObserver = new ResizeObserver(() => updateIframeHeight());
-            resizeObserver.observe(document.body);
+            const container = document.querySelector('.container');
+            const resizeObserver = new ResizeObserver(() => {
+                updateIframeHeight();
+            });
+            // 늘어나는 body 대신 container 요소만 감시합니다.
+            resizeObserver.observe(container);
         }
     </script>
+    
 </body>
 </html>
