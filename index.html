@@ -587,31 +587,41 @@
         });
 
 // ==========================================
-        // 미닛 통신 연동 (여백 무한 증식 버그 완벽 해결판)
+        // 🌟 미닛 통신 연동 (무한 증식 완벽 차단판)
         // ==========================================
+        let lastSentHeight = 0; // 마지막으로 미닛에 보낸 길이를 기억하는 변수
+
         function updateIframeHeight() {
-            // 전체 화면(body)이 아닌 내용물 뼈대(.container)의 순수 높이만 측정합니다.
             const container = document.querySelector('.container');
             if (!container) return;
             
-            // 컨테이너 순수 높이 + 상하 패딩(100px)만 더해서 보냄 (무한 루프 원천 차단)
+            // 컨테이너 높이 + 상하 여백(100px) 계산
             const exactHeight = container.offsetHeight + 100;
-            window.parent.postMessage({ type: 'resize', height: exactHeight }, '*');
+            
+            // 🌟 핵심: 이전 높이와 비교해서 20px 이상 차이가 날 때만 미닛에 전송!
+            // (3D 뷰어의 0.1px 미세 진동으로 인한 무한 루프 차단)
+            if (Math.abs(exactHeight - lastSentHeight) > 20) {
+                lastSentHeight = exactHeight;
+                window.parent.postMessage({ type: 'resize', height: exactHeight }, '*');
+            }
         }
 
+        // 처음에 로딩될 때 한 번 측정 (사진/3D 로딩 시간 고려해 0.5초 뒤)
         window.addEventListener('load', () => {
-            setTimeout(updateIframeHeight, 300);
+            setTimeout(updateIframeHeight, 500);
         });
 
+        // 내용물 크기 변화 감지
         if ('ResizeObserver' in window) {
             const container = document.querySelector('.container');
             const resizeObserver = new ResizeObserver(() => {
-                updateIframeHeight();
+                // ResizeObserver가 너무 미쳐 날뛰지 않도록 약간의 딜레이(디바운싱)를 줍니다
+                requestAnimationFrame(() => {
+                    updateIframeHeight();
+                });
             });
-            // 늘어나는 body 대신 container 요소만 감시합니다.
             resizeObserver.observe(container);
         }
     </script>
-    
 </body>
 </html>
