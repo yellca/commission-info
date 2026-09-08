@@ -15,7 +15,7 @@
             margin: 0; padding: 50px 20px; font-family: 'Pretendard', -apple-system, sans-serif;
             color: #555555; line-height: 1.7; word-break: keep-all;
             background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 100%); min-height: 100vh;
-            position: relative; /* 모달창 위치 계산을 위한 필수 속성 */
+            position: relative;
         }
 
         .container { max-width: 680px; margin: 0 auto; position: relative; z-index: 1; }
@@ -68,7 +68,7 @@
         .price-table td { text-align: right; font-size: 18px; font-weight: 700; color: #ff2a75; }
 
         /* -------------------------------------
-           뷰어 공통 스타일 (3D 및 2D 갤러리)
+           뷰어 공통 스타일
            ------------------------------------- */
         .preview-title {
             text-align: center; font-size: 14px; color: #fa6698; font-weight: 700; 
@@ -102,13 +102,8 @@
 
         .model-indicator { text-align: center; margin-top: 12px; font-size: 14px; font-weight: 700; color: #fa6698; letter-spacing: 1px; }
 
-        /* 3D 뷰어 전용 */
-        model-viewer {
-            width: 100%; height: 100%; background-color: #ffffff;
-            --poster-color: transparent;
-        }
-
-        /* 2D 이미지 갤러리 전용 */
+        /* 3D & 2D 뷰어 속성 */
+        model-viewer { width: 100%; height: 100%; background-color: #ffffff; --poster-color: transparent; }
         .image-gallery-box { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         .image-gallery-box img, .mixed-cover-img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
@@ -116,20 +111,15 @@
            🌟 미닛 대응 풀스크린 팝업 (모달창) CSS
            ------------------------------------- */
         .modal-overlay {
-            display: none; 
-            position: absolute; /* 미닛 오류 방지를 위해 fixed 대신 absolute 사용 */
-            top: 0; left: 0; width: 100%; height: 100%;
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             z-index: 99999; 
         }
         .modal-overlay.active { display: block; }
         
         .modal-box {
-            position: absolute; 
-            left: 50%; 
-            transform: translateX(-50%) translateY(-50%); /* 자바스크립트로 강제 위치 계산 시 중심점 역할 */
-            width: 90vw; max-width: 900px; 
-            height: 60vh; max-height: 700px; /* 창 크기를 안정적인 픽셀/비율로 고정 */
+            position: absolute; left: 50%; transform: translateX(-50%) translateY(-50%); 
+            width: 90vw; max-width: 900px; height: 60vh; max-height: 700px; 
             background: #ffffff; border: 2px solid #fed9e5; border-radius: 20px;
             box-shadow: 0 15px 50px rgba(255, 42, 117, 0.2); overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
@@ -138,9 +128,17 @@
             position: absolute; top: 15px; right: 15px; width: 44px; height: 44px;
             background: #fff0f5; color: #ff2a75; border: none; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            z-index: 10; transition: background 0.2s;
+            z-index: 20; transition: background 0.2s;
         }
         .modal-close-btn:hover { background: #ff2a75; color: #ffffff; }
+
+        /* 모달 내 이미지 줌(확대) 기능 전용 */
+        #modalViewerImg {
+            width: 100%; height: 100%; object-fit: contain;
+            transition: transform 0.1s ease-out; /* 부드러운 스크롤 줌을 위한 트랜지션 */
+            cursor: grab; /* 마우스 커서 손모양 */
+        }
+        #modalViewerImg:active { cursor: grabbing; }
 
         /* 하단 닫기/기타 */
         .impossible-list { list-style: none; padding: 0; margin: 0; font-size: 15.5px; color: #4a4a4a; }
@@ -232,7 +230,6 @@
             <p class="preview-title">✦ 3D INTERACTIVE PREVIEW ✦</p>
             
             <div class="viewer-container">
-                <!-- 크게 보기(확대) 버튼 -->
                 <button class="enlarge-btn" id="enlarge3dBtn" title="크게 보기">
                     <svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;">
                         <path d="M15 3H21V9M9 21H3V15M21 3L14 10M3 21L10 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -241,10 +238,7 @@
 
                 <button class="nav-btn prev-btn" id="prev3dBtn"><svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                 
-                <!-- 3D 뷰어 -->
                 <model-viewer id="my3dViewer" src="" camera-controls auto-rotate shadow-intensity="1" style="display: none;"></model-viewer>
-                
-                <!-- 2D 이미지 표지 뷰어 -->
                 <img id="my3dCover" class="mixed-cover-img" src="" alt="프리뷰 썸네일" style="display: none;">
                 
                 <button class="nav-btn next-btn" id="next3dBtn"><svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -257,7 +251,6 @@
             <p class="preview-title">✦ 2D IMAGE SAMPLES ✦</p>
             
             <div class="viewer-container">
-                <!-- 크게 보기(확대) 버튼 (이미지 샘플용) -->
                 <button class="enlarge-btn" id="enlargeImgBtn" title="크게 보기">
                     <svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;">
                         <path d="M15 3H21V9M9 21H3V15M21 3L14 10M3 21L10 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -313,59 +306,90 @@
                 </strong>
                 <span style="font-size: 13.5px; color: #6a6a6a; display:block; margin-top: 4px;">클튜 5.0부터 지원하는 '사실적인 3D' 및 '그릴 수 있는 모델'은 버전이 맞지 않아 테스트가 불가하여 지원이 어렵습니다.</span>
             </div>
-            
             <a href="https://www.clipstudio.net/kr/functional_list_ver/" target="_blank" class="btn-link">
                 공식 사이트에서 클튜 3D 호환 기능 확인하기
             </a>
         </div>
     </div>
 
-    <!-- 🌟 크게보기 모달 팝업 구조 -->
+    <!-- =====================================
+         🌟 크게보기 모달 팝업 구조 (+내부 네비게이션 버튼)
+         ===================================== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box" id="modalBox">
+            <!-- 닫기 버튼 -->
             <button class="modal-close-btn" id="modalCloseBtn">
                 <svg viewBox="0 0 24 24" fill="none" style="width:28px; height:28px;">
                     <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
+            
+            <!-- 모달 내부 좌측 버튼 -->
+            <button class="nav-btn prev-btn" id="modalPrevBtn" style="z-index: 15;">
+                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+
+            <!-- 뷰어 -->
             <model-viewer id="modalViewer3d" src="" camera-controls auto-rotate shadow-intensity="1" style="display: none; width:100%; height:100%;"></model-viewer>
-            <img id="modalViewerImg" src="" style="width:100%; height:100%; object-fit:contain; display: none;">
+            <img id="modalViewerImg" src="" style="display: none;">
+
+            <!-- 모달 내부 우측 버튼 -->
+            <button class="nav-btn next-btn" id="modalNextBtn" style="z-index: 15;">
+                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
         </div>
     </div>
 
     <!-- 🌟 스크립트 -->
     <script>
         // ==========================================
-        // 🌟 모달 공통 요소 및 미닛 오류 해결 마법의 좌표 계산
+        // 🌟 모달 공통 요소 및 마법의 좌표 계산
         // ==========================================
         const modalOverlay = document.getElementById('modalOverlay');
         const modalBox = document.getElementById('modalBox');
         const modalViewer3d = document.getElementById('modalViewer3d');
         const modalViewerImg = document.getElementById('modalViewerImg');
+        
+        let activeGallery = ''; // 현재 모달이 어떤 갤러리를 띄우고 있는지 추적 ('mixed' or 'image')
+        let imageScale = 1;     // 이미지 줌 상태값 저장
 
-        // 버튼 위치를 추적해서 모달창을 바로 눈앞에 띄워주는 함수
-        function showModalAtButton(btnElement) {
+        function showModalAtButton(btnElement, galleryType) {
+            activeGallery = galleryType; // 어떤 갤러리 열었는지 기억
             const rect = btnElement.getBoundingClientRect();
-            // 미닛 iframe 안에서 버튼의 실제 절대 위치를 찾습니다
             const absoluteTop = window.scrollY + rect.top;
             
-            // 모달창이 화면 위로 잘리지 않게 최소 위치 보정
             let targetTop = absoluteTop;
             if (targetTop < 300) targetTop = 300; 
 
-            // 모달창 위치 강제 지정 후 열기
             modalBox.style.top = targetTop + 'px';
             modalOverlay.classList.add('active');
+            resetImageZoom(); // 열 때마다 줌 초기화
         }
 
-        // 모달 닫기 로직 (바탕이나 X 버튼 클릭 시)
+        // 모달 닫기
         modalOverlay.addEventListener('click', (e) => {
             if (e.target === modalOverlay || e.target.closest('.modal-close-btn')) {
                 modalOverlay.classList.remove('active');
                 modalViewer3d.src = ""; 
                 modalViewerImg.src = "";
+                resetImageZoom();
             }
         });
+
+        // 🌟 모달창 안에서 휠 굴려서 이미지 확대/축소(Zoom) 기능
+        modalViewerImg.addEventListener('wheel', (e) => {
+            e.preventDefault(); // 기본 스크롤 막기
+            // 휠 방향에 따라 scale 값 조절 (확대 비율 속도 조절)
+            imageScale += e.deltaY * -0.0015; 
+            // 너무 작아지거나 너무 커지지 않게 제한 (1배 ~ 5배)
+            imageScale = Math.min(Math.max(1, imageScale), 5); 
+            modalViewerImg.style.transform = `scale(${imageScale})`;
+        });
+
+        function resetImageZoom() {
+            imageScale = 1;
+            modalViewerImg.style.transform = `scale(1)`;
+        }
 
         // ==========================================
         // 1. 3D & 커버 뷰어 (혼합형)
@@ -396,7 +420,6 @@
                 viewer3d.style.display = 'block';
                 viewer3d.src = currentFile;
             }
-            
             indicator3d.textContent = (current3dIndex + 1) + ' / ' + mixedFiles.length;
         }
 
@@ -404,18 +427,20 @@
             current3dIndex = (current3dIndex - 1 + mixedFiles.length) % mixedFiles.length;
             update3dModel();
         });
-
         document.getElementById('next3dBtn').addEventListener('click', () => {
             current3dIndex = (current3dIndex + 1) % mixedFiles.length;
             update3dModel();
         });
         
-        // 3D/혼합 뷰어에서 크게 보기 버튼 클릭 시
+        // 크게 보기
         const enlarge3dBtn = document.getElementById('enlarge3dBtn');
         enlarge3dBtn.addEventListener('click', () => {
-            if(mixedFiles.length === 0) return;
-            const currentFile = mixedFiles[current3dIndex];
+            showModalAtButton(enlarge3dBtn, 'mixed'); 
+            syncModalWithMixed();
+        });
 
+        function syncModalWithMixed() {
+            const currentFile = mixedFiles[current3dIndex];
             if(currentFile.toLowerCase().endsWith('.png') || currentFile.toLowerCase().endsWith('.jpg') || currentFile.toLowerCase().endsWith('.jpeg')) {
                 modalViewer3d.style.display = 'none';
                 modalViewerImg.style.display = 'block';
@@ -425,29 +450,16 @@
                 modalViewer3d.style.display = 'block';
                 modalViewer3d.src = currentFile;
             }
-            showModalAtButton(enlarge3dBtn); // 좌표 계산 함수 실행
-        });
-
+        }
         update3dModel();
 
         // ==========================================
         // 2. 2D 이미지 전용 샘플 뷰어
         // ==========================================
         const imgFiles = [
-            "sample01.png",
-            "sample02.png",
-            "sample03.png",
-            "sample04.png",
-            "sample05.png",
-            "sample06.png",
-            "sample07.png",
-            "sample08.png",
-            "sample09.png",
-            "sample10.png",
-            "sample11.png",
-            "sample12.png",
-            "sample13.png",
-            "sample14.png"
+            "sample01.png", "sample02.png", "sample03.png", "sample04.png", "sample05.png",
+            "sample06.png", "sample07.png", "sample08.png", "sample09.png", "sample10.png",
+            "sample11.png", "sample12.png", "sample13.png", "sample14.png"
         ];
 
         let currentImgIndex = 0;
@@ -464,23 +476,57 @@
             currentImgIndex = (currentImgIndex - 1 + imgFiles.length) % imgFiles.length;
             updateImage();
         });
-
         document.getElementById('nextImgBtn').addEventListener('click', () => {
             currentImgIndex = (currentImgIndex + 1) % imgFiles.length;
             updateImage();
         });
 
-        // 2D 이미지 뷰어에서 크게 보기 버튼 클릭 시
+        // 크게 보기
         const enlargeImgBtn = document.getElementById('enlargeImgBtn');
         enlargeImgBtn.addEventListener('click', () => {
-            if(imgFiles.length === 0) return;
+            showModalAtButton(enlargeImgBtn, 'image'); 
+            syncModalWithImage();
+        });
+
+        function syncModalWithImage() {
             modalViewer3d.style.display = 'none'; 
             modalViewerImg.style.display = 'block'; 
             modalViewerImg.src = imgFiles[currentImgIndex]; 
-            showModalAtButton(enlargeImgBtn); // 좌표 계산 함수 실행
+        }
+        updateImage();
+
+        // ==========================================
+        // 🌟 모달창 내부 좌우 화살표 클릭 연동
+        // ==========================================
+        document.getElementById('modalPrevBtn').addEventListener('click', (e) => {
+            e.stopPropagation(); // 모달 꺼지는 것 방지
+            resetImageZoom(); // 넘길 때 줌 원상복구
+            
+            if (activeGallery === 'mixed') {
+                current3dIndex = (current3dIndex - 1 + mixedFiles.length) % mixedFiles.length;
+                update3dModel(); // 배경 뷰어도 동시 업데이트
+                syncModalWithMixed();
+            } else if (activeGallery === 'image') {
+                currentImgIndex = (currentImgIndex - 1 + imgFiles.length) % imgFiles.length;
+                updateImage(); // 배경 뷰어도 동시 업데이트
+                syncModalWithImage();
+            }
         });
 
-        updateImage();
+        document.getElementById('modalNextBtn').addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            resetImageZoom(); 
+            
+            if (activeGallery === 'mixed') {
+                current3dIndex = (current3dIndex + 1) % mixedFiles.length;
+                update3dModel();
+                syncModalWithMixed();
+            } else if (activeGallery === 'image') {
+                currentImgIndex = (currentImgIndex + 1) % imgFiles.length;
+                updateImage();
+                syncModalWithImage();
+            }
+        });
 
         // ==========================================
         // 미닛 통신 연동 (자동 높이 조절)
