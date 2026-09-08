@@ -68,7 +68,7 @@
         .price-table td { text-align: right; font-size: 18px; font-weight: 700; color: #ff2a75; }
 
         /* -------------------------------------
-           뷰어 공통 스타일
+           뷰어 공통 스타일 (3D 및 2D 갤러리)
            ------------------------------------- */
         .preview-title {
             text-align: center; font-size: 14px; color: #fa6698; font-weight: 700; 
@@ -102,8 +102,13 @@
 
         .model-indicator { text-align: center; margin-top: 12px; font-size: 14px; font-weight: 700; color: #fa6698; letter-spacing: 1px; }
 
-        /* 3D & 2D 뷰어 속성 */
-        model-viewer { width: 100%; height: 100%; background-color: #ffffff; --poster-color: transparent; }
+        /* 3D 뷰어 전용 */
+        model-viewer {
+            width: 100%; height: 100%; background-color: #ffffff;
+            --poster-color: transparent;
+        }
+
+        /* 2D 이미지 갤러리 전용 */
         .image-gallery-box { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         .image-gallery-box img, .mixed-cover-img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
@@ -111,15 +116,20 @@
            🌟 미닛 대응 풀스크린 팝업 (모달창) CSS
            ------------------------------------- */
         .modal-overlay {
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; 
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             z-index: 99999; 
         }
         .modal-overlay.active { display: block; }
         
         .modal-box {
-            position: absolute; left: 50%; transform: translateX(-50%) translateY(-50%); 
-            width: 90vw; max-width: 900px; height: 60vh; max-height: 700px; 
+            position: absolute; 
+            left: 50%; 
+            transform: translateX(-50%) translateY(-50%); 
+            width: 90vw; max-width: 900px; 
+            height: 60vh; max-height: 700px; 
             background: #ffffff; border: 2px solid #fed9e5; border-radius: 20px;
             box-shadow: 0 15px 50px rgba(255, 42, 117, 0.2); overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
@@ -132,13 +142,15 @@
         }
         .modal-close-btn:hover { background: #ff2a75; color: #ffffff; }
 
-        /* 모달 내 이미지 줌(확대) 기능 전용 */
+        /* 🌟 모달 내 이미지 줌/팬 기능 전용 */
         #modalViewerImg {
             width: 100%; height: 100%; object-fit: contain;
-            transition: transform 0.1s ease-out; /* 부드러운 스크롤 줌을 위한 트랜지션 */
-            cursor: grab; /* 마우스 커서 손모양 */
+            cursor: grab; /* 평소엔 손바닥 모양 */
+            transition: transform 0.1s ease-out; /* 부드러운 스크롤 */
+            /* 브라우저 기본 이미지 드래그 현상 방지용 */
+            -webkit-user-drag: none; 
         }
-        #modalViewerImg:active { cursor: grabbing; }
+        #modalViewerImg:active { cursor: grabbing; /* 클릭하면 주먹 쥔 손 모양 */ transition: none; /* 드래그할 땐 딜레이 없이 팍팍 이동 */ }
 
         /* 하단 닫기/기타 */
         .impossible-list { list-style: none; padding: 0; margin: 0; font-size: 15.5px; color: #4a4a4a; }
@@ -230,6 +242,7 @@
             <p class="preview-title">✦ 3D INTERACTIVE PREVIEW ✦</p>
             
             <div class="viewer-container">
+                <!-- 크게 보기(확대) 버튼 -->
                 <button class="enlarge-btn" id="enlarge3dBtn" title="크게 보기">
                     <svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;">
                         <path d="M15 3H21V9M9 21H3V15M21 3L14 10M3 21L10 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -238,8 +251,11 @@
 
                 <button class="nav-btn prev-btn" id="prev3dBtn"><svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                 
+                <!-- 3D 뷰어 -->
                 <model-viewer id="my3dViewer" src="" camera-controls auto-rotate shadow-intensity="1" style="display: none;"></model-viewer>
-                <img id="my3dCover" class="mixed-cover-img" src="" alt="프리뷰 썸네일" style="display: none;">
+                
+                <!-- 2D 이미지 표지 뷰어 -->
+                <img id="my3dCover" class="mixed-cover-img" src="" alt="프리뷰 썸네일" style="display: none;" draggable="false">
                 
                 <button class="nav-btn next-btn" id="next3dBtn"><svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             </div>
@@ -251,6 +267,7 @@
             <p class="preview-title">✦ 2D IMAGE SAMPLES ✦</p>
             
             <div class="viewer-container">
+                <!-- 크게 보기(확대) 버튼 (이미지 샘플용) -->
                 <button class="enlarge-btn" id="enlargeImgBtn" title="크게 보기">
                     <svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;">
                         <path d="M15 3H21V9M9 21H3V15M21 3L14 10M3 21L10 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -260,7 +277,7 @@
                 <button class="nav-btn prev-btn" id="prevImgBtn"><svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                 
                 <div class="image-gallery-box">
-                    <img id="myImgViewer" src="" alt="샘플 이미지">
+                    <img id="myImgViewer" src="" alt="샘플 이미지" draggable="false">
                 </div>
                 
                 <button class="nav-btn next-btn" id="nextImgBtn"><svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -331,7 +348,7 @@
 
             <!-- 뷰어 -->
             <model-viewer id="modalViewer3d" src="" camera-controls auto-rotate shadow-intensity="1" style="display: none; width:100%; height:100%;"></model-viewer>
-            <img id="modalViewerImg" src="" style="display: none;">
+            <img id="modalViewerImg" src="" style="display: none;" draggable="false"> <!-- draggable="false"로 기본 드래그 방지 -->
 
             <!-- 모달 내부 우측 버튼 -->
             <button class="nav-btn next-btn" id="modalNextBtn" style="z-index: 15;">
@@ -351,10 +368,14 @@
         const modalViewerImg = document.getElementById('modalViewerImg');
         
         let activeGallery = ''; // 현재 모달이 어떤 갤러리를 띄우고 있는지 추적 ('mixed' or 'image')
-        let imageScale = 1;     // 이미지 줌 상태값 저장
+        let imageScale = 1;     // 이미지 줌 상태값
+        let translateX = 0;     // 이미지 가로 이동값
+        let translateY = 0;     // 이미지 세로 이동값
+        let isDragging = false; // 이미지 드래그 상태
+        let startX, startY;     // 마우스 클릭 시작 좌표
 
         function showModalAtButton(btnElement, galleryType) {
-            activeGallery = galleryType; // 어떤 갤러리 열었는지 기억
+            activeGallery = galleryType; 
             const rect = btnElement.getBoundingClientRect();
             const absoluteTop = window.scrollY + rect.top;
             
@@ -363,7 +384,7 @@
 
             modalBox.style.top = targetTop + 'px';
             modalOverlay.classList.add('active');
-            resetImageZoom(); // 열 때마다 줌 초기화
+            resetImageZoomAndPan(); 
         }
 
         // 모달 닫기
@@ -372,23 +393,60 @@
                 modalOverlay.classList.remove('active');
                 modalViewer3d.src = ""; 
                 modalViewerImg.src = "";
-                resetImageZoom();
+                resetImageZoomAndPan();
             }
         });
 
         // 🌟 모달창 안에서 휠 굴려서 이미지 확대/축소(Zoom) 기능
         modalViewerImg.addEventListener('wheel', (e) => {
-            e.preventDefault(); // 기본 스크롤 막기
-            // 휠 방향에 따라 scale 값 조절 (확대 비율 속도 조절)
+            e.preventDefault(); 
+            // 휠 내리면 축소, 올리면 확대
             imageScale += e.deltaY * -0.0015; 
-            // 너무 작아지거나 너무 커지지 않게 제한 (1배 ~ 5배)
+            // 1배 ~ 5배 사이로 제한
             imageScale = Math.min(Math.max(1, imageScale), 5); 
-            modalViewerImg.style.transform = `scale(${imageScale})`;
+            
+            // 배율이 1이 되면 줌아웃 완료이므로 이동값(Pan) 정중앙으로 초기화
+            if (imageScale === 1) {
+                translateX = 0;
+                translateY = 0;
+            }
+            modalViewerImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${imageScale})`;
         });
 
-        function resetImageZoom() {
+        // 🌟 클릭 앤 드래그 (Pan) 기능
+        modalViewerImg.addEventListener('mousedown', (e) => {
+            // 확대(Zoom)된 상태일 때만 드래그 허용
+            if (imageScale > 1) {
+                isDragging = true;
+                // 기존에 이동해둔 좌표에서부터 다시 시작
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                modalViewerImg.style.cursor = 'grabbing';
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            translateX = e.clientX - startX;
+            translateY = e.clientY - startY;
+            modalViewerImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${imageScale})`;
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                modalViewerImg.style.cursor = 'grab';
+            }
+        });
+
+        // 사진을 바꿀 때나 켤/끌 때 리셋하는 함수
+        function resetImageZoomAndPan() {
             imageScale = 1;
-            modalViewerImg.style.transform = `scale(1)`;
+            translateX = 0;
+            translateY = 0;
+            modalViewerImg.style.transform = `translate(0px, 0px) scale(1)`;
+            modalViewerImg.style.cursor = 'grab';
         }
 
         // ==========================================
@@ -500,22 +558,22 @@
         // ==========================================
         document.getElementById('modalPrevBtn').addEventListener('click', (e) => {
             e.stopPropagation(); // 모달 꺼지는 것 방지
-            resetImageZoom(); // 넘길 때 줌 원상복구
+            resetImageZoomAndPan(); // 넘길 때 줌/위치 원상복구
             
             if (activeGallery === 'mixed') {
                 current3dIndex = (current3dIndex - 1 + mixedFiles.length) % mixedFiles.length;
-                update3dModel(); // 배경 뷰어도 동시 업데이트
+                update3dModel(); 
                 syncModalWithMixed();
             } else if (activeGallery === 'image') {
                 currentImgIndex = (currentImgIndex - 1 + imgFiles.length) % imgFiles.length;
-                updateImage(); // 배경 뷰어도 동시 업데이트
+                updateImage(); 
                 syncModalWithImage();
             }
         });
 
         document.getElementById('modalNextBtn').addEventListener('click', (e) => {
             e.stopPropagation(); 
-            resetImageZoom(); 
+            resetImageZoomAndPan(); 
             
             if (activeGallery === 'mixed') {
                 current3dIndex = (current3dIndex + 1) % mixedFiles.length;
